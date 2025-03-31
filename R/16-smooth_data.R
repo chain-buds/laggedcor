@@ -23,8 +23,8 @@
 #' res <- smooth_data(x, time, span, degree, should_plot = TRUE)
 #'
 #' @export
-#' @author Zirui Qiang \email{{zirui_qiang@outlook.com}}
-#' @author Minghang Li \email{{minghli@ethz.ch}}
+#' @author Zirui Qiang \email{zirui_qiang@outlook.com}
+#' @author Minghang Li \email{minghli@ethz.ch}
 
 smooth_data <- function(x,
                         time,

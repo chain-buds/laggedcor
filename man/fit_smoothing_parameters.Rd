@@ -41,7 +41,7 @@ best_params
 
 }
 \author{
-Zirui Qiang \email{{zirui_qiang@outlook.com}}
+Zirui Qiang \email{zirui_qiang@outlook.com}
 
-Minghang Li \email{{minghli@ethz.ch}}
+Minghang Li \email{minghli@ethz.ch}
 }

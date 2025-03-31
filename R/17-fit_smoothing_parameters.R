@@ -20,8 +20,8 @@
 #'
 #' @export
 #'
-#' @author Zirui Qiang \email{{zirui_qiang@outlook.com}}
-#' @author Minghang Li \email{{minghli@ethz.ch}}
+#' @author Zirui Qiang \email{zirui_qiang@outlook.com}
+#' @author Minghang Li \email{minghli@ethz.ch}
 fit_smoothing_parameters <- function(x,
                                      time,
                                      threads = 2,
