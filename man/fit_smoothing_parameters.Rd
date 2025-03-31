@@ -7,7 +7,7 @@
 fit_smoothing_parameters(
   x,
   time,
-  threads = 10,
+  threads = 2,
   span_values = seq(0.1, 0.5, by = 0.01),
   degree_values = 1:2,
   progressbar = TRUE,
