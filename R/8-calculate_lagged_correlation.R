@@ -56,6 +56,7 @@
 #'     cor_method = "spearman"
 #'   )
 #' object
+#' @importFrom stats approx ccf pnorm
 
 calculate_lagged_correlation <-
   function(x,

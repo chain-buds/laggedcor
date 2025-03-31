@@ -18,6 +18,7 @@
 #'                                         time = step_data$time)
 #' best_params
 #'
+#' @importFrom stats cor na.omit
 #' @export
 #'
 #' @author Zirui Qiang \email{zirui_qiang@outlook.com}
