@@ -47,7 +47,8 @@ Imports:
     pracma,
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat
 VignetteBuilder: knitr
 biocViews: Technology
 Remotes: 
