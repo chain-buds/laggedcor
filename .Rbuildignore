@@ -21,3 +21,4 @@ vignettes/
 .Rhistory
 
 man/figures
+^methods$
