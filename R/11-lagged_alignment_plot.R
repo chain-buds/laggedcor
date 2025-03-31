@@ -236,7 +236,7 @@ lagged_alignment_plot =
       scale_x_datetime(
         breaks = scales::date_breaks(paste(time_gap, "hour")),
         date_labels = "%a %H:%M",
-        timezone = "America/Los_Angeles",#这里使用了时区的硬编码，需要参考15.time_plot.R处理时区问题。
+        timezone = "America/Los_Angeles",
         limits = c(min(time1[!is.na(time1)][x_limit[1]],
                        time2[!is.na(time2)][x_limit[1]]),
                    max(time1[!is.na(time1)][x_limit[2]],
