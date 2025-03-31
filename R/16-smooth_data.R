@@ -8,8 +8,9 @@
 #' @param time A POSIXct or POSIXlt object representing the time points of the x values.
 #' @param span A numeric vector of span values to be used in the Loess smoothing.
 #' @param should_plot A logical value indicating whether to plot the original and smoothed data.
-#' @param color_orignal The color to be used for the original data in the plot. Default is "blue".
+#' @param color_original The color to be used for the original data in the plot. Default is "blue".
 #' @param color_smoothed The color to be used for the smoothed data in the plot. Default is "red".
+#' @param degree Polynomial order.
 #'
 #' @return A list containing the original and smoothed data, as well as the span values used.
 #'

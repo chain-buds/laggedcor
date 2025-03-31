@@ -9,6 +9,8 @@
 #' @param seed An integer for the random seed (default is 123).
 #' @param span_values A numeric vector of span values to test (default is seq(0.1, 0.5, by = 0.01)).
 #' @param degree_values A numeric vector of degree values to test (default is 1:2).
+#' @param progressbar Whether to display the parallel computing progress bar.
+#' @param threads The number of CPU threads used in parallel computing.
 #'
 #' @return A list of the best span and degree parameters for the LOESS data smoothing method.
 #'

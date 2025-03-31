@@ -41,7 +41,13 @@ a valid correlation (default is 10).}
 
 \item{all_idx}{An optional precomputed index list to speed up calculations.}
 
-\item{threads}{The number of threads to use for parallel processing (default is 10).}
+\item{B}{description}
+
+\item{smooth}{description}
+
+\item{threads}{The number of threads to use for parallel processing (default is 2).}
+
+\item{align_method}{description}
 
 \item{cor_method}{The method for computing correlation: "spearman" or "pearson"
 (default is "spearman").}

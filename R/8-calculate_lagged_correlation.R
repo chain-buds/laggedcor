@@ -15,9 +15,12 @@
 #'   a valid correlation (default is 10).
 #' @param progressbar Logical indicating whether to show a progress bar (default is TRUE).
 #' @param all_idx An optional precomputed index list to speed up calculations.
-#' @param threads The number of threads to use for parallel processing (default is 10).
+#' @param threads The number of threads to use for parallel processing (default is 2).
 #' @param cor_method The method for computing correlation: "spearman" or "pearson"
 #'   (default is "spearman").
+#' @param B description
+#' @param align_method description
+#' @param smooth description
 #'
 #' @return An object of class "lagged_cor_result" containing the lagged correlation
 #'   results, indices, and other relevant data.

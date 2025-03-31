@@ -19,9 +19,13 @@ fit_smoothing_parameters(
 
 \item{time}{A numeric vector of timestamps corresponding to \code{x}. (POSIXct)}
 
+\item{threads}{The number of CPU threads used in parallel computing.}
+
 \item{span_values}{A numeric vector of span values to test (default is seq(0.1, 0.5, by = 0.01)).}
 
 \item{degree_values}{A numeric vector of degree values to test (default is 1:2).}
+
+\item{progressbar}{Whether to display the parallel computing progress bar.}
 
 \item{seed}{An integer for the random seed (default is 123).}
 }

@@ -21,11 +21,13 @@ smooth_data(
 
 \item{span}{A numeric vector of span values to be used in the Loess smoothing.}
 
+\item{degree}{Polynomial order.}
+
 \item{should_plot}{A logical value indicating whether to plot the original and smoothed data.}
 
-\item{color_smoothed}{The color to be used for the smoothed data in the plot. Default is "red".}
+\item{color_original}{The color to be used for the original data in the plot. Default is "blue".}
 
-\item{color_orignal}{The color to be used for the original data in the plot. Default is "blue".}
+\item{color_smoothed}{The color to be used for the smoothed data in the plot. Default is "red".}
 }
 \value{
 A list containing the original and smoothed data, as well as the span values used.
