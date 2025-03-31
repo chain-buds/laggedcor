@@ -1,4 +1,4 @@
-library(testthat)
+#library(testthat)
 
 generate_time_series <- function(seed = 123, lag_minutes = 10) {
   set.seed(seed = seed)
