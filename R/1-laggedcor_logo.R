@@ -17,9 +17,9 @@
 #' @importFrom BiocParallel SnowParam MulticoreParam
 #' @import ggrepel
 #' @import ggsci
-#' @import lubridate
+#' @importFrom lubridate ymd_hms date tz as_datetime hour minute month day
 #' @import scales
-#' @import hms
+#' @importFrom hms as_hms
 #' @importFrom methods new
 #' @importClassesFrom massdataset tidymass_parameter
 #' @examples

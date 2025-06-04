@@ -12,5 +12,6 @@ globalVariables(names = c(
   "value",
   "accurate_time",
   "start_time",
-  "end_time"
+  "end_time",
+  "week"
 ))

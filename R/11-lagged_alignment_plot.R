@@ -75,6 +75,47 @@ lagged_alignment_plot =
            time_gap = 4) {
     which = match.arg(which)
     
+    old_locale <- Sys.getlocale("LC_TIME")
+    
+    get_english_locale <- function() {
+      sys_type <- .Platform$OS.type
+      
+      # Windows 系统
+      if (sys_type == "windows") {
+        return("English")  # Windows 标准英文区域名
+        
+        # Unix/Linux/macOS 系统
+      } else if (sys_type == "unix") {
+        return("en_US.UTF-8")  # 通用Unix英文区域
+        
+        # 未知系统默认尝试Unix格式
+      } else {
+        warning("Unknown OS type, trying Unix-style locale")
+        return("en_US.UTF-8")
+      }
+    }
+    
+    target_locale <- get_english_locale()
+    
+    tryCatch(
+      {
+        # 尝试将日期时间区域设置为 target_locale
+        Sys.setlocale("LC_TIME", target_locale)
+      },
+      # 如果设置失败，执行错误处理函数
+      error = function(e) {
+        # 抛出明确的错误信息：
+        stop(
+          paste(
+            "Failed to set locale to", target_locale, "\n",  # 提示目标区域设置失败
+            "Available locales on your system:\n",           # 列出当前系统可用区域
+            paste(Sys.getlocale("LC_TIME"), collapse = ", "), # 显示当前实际生效的区域
+          ),
+          call. = FALSE  # 禁用调用堆栈显示，使错误信息更简洁
+        )
+      }
+    )
+
     if(is.null(object)){
       return(NULL)
     }
@@ -327,5 +368,6 @@ lagged_alignment_plot =
           unit = "pt"
         )
       )
-    plot
+    return(plot)
+    Sys.setlocale("LC_TIME", old_locale)  # 将 LC_TIME 恢复为原始值
   }
