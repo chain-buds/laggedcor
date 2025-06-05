@@ -57,55 +57,62 @@ lagged_scatter_plot <-
            y_name = "y",
            which = c("global", "max"),
            hex = FALSE) {
-    which = match.arg(which)
-    
+    which <- match.arg(which)
+
     if (is.null(object)) {
       return(NULL)
     }
-    
-    if (which == "global") {
-      idx = object@global_idx
-      
-      which_global_idx = stringr::str_split(object@shift_time, ",") %>%
-        purrr::map(function(x) {
-          mean(as.numeric(stringr::str_replace(x, "\\(|\\]", "")))
-        }) %>%
-        unlist() %>%
-        as.numeric() %>%
-        `==`(0) %>%
-        which()
-      shift = object@shift_time[which_global_idx]
-      correlation = round(object@global_cor, 3)
-    } else{
-      idx = object@max_idx
-      shift = object@shift_time[object@which_max_idx]
-      correlation = round(object@max_cor, 3)
+
+    step <- object@parameter@parameter$step
+    if (is.null(step)) {
+      stop("step information is missing in the result object")
     }
-    
-    time1 = object@time1
-    time2 = object@time2
-    x = object@x
-    y = object@y
-    
-    idx1 =
-      lapply(idx, function(x) {
-        length(x)
-      }) %>%
-      unlist() %>%
-      `>`(0) %>%
-      which()
-    
-    x2 = x[idx1]
-    
-    y2 =
-      lapply(idx, function(z) {
-        mean(y[z])
-      }) %>%
-      unlist()
-    
-    y2 = y2[!is.na(y2)]
-    
-    value = data.frame(x2, y2)
+
+    time1 <- object@time1
+    time2 <- object@time2
+    x <- object@x
+    y <- object@y
+
+    # align two series using the same procedure as in calculate_lagged_correlation
+    start_time <- max(min(time1), min(time2))
+    end_time <- min(max(time1), max(time2))
+    target_freq <- paste(step * 60, "min")
+    regular_times <- seq(from = start_time, to = end_time, by = target_freq)
+
+    x_aligned <- approx(x = time1, y = x, xout = regular_times, method = "linear")$y
+    y_aligned <- approx(x = time2, y = y, xout = regular_times, method = "linear")$y
+
+    # calculate lag in number of steps from shift_time string
+    shift_time_num <- sapply(object@shift_time, function(x) {
+      x %>%
+        stringr::str_replace("\\(", "") %>%
+        stringr::str_replace("\\]", "") %>%
+        stringr::str_split(",") %>%
+        `[[`(1) %>%
+        as.numeric() %>%
+        mean()
+    })
+
+    lag_steps <- round(shift_time_num / (step * 60))
+
+    sel_idx <- if (which == "max") object@which_max_idx else object@which_global_idx
+    lag_step <- lag_steps[sel_idx]
+
+    if (lag_step > 0) {
+      x2 <- x_aligned[(lag_step + 1):length(x_aligned)]
+      y2 <- y_aligned[1:(length(y_aligned) - lag_step)]
+    } else if (lag_step < 0) {
+      lag_step <- abs(lag_step)
+      x2 <- x_aligned[1:(length(x_aligned) - lag_step)]
+      y2 <- y_aligned[(lag_step + 1):length(y_aligned)]
+    } else {
+      x2 <- x_aligned
+      y2 <- y_aligned
+    }
+
+    value <- data.frame(x2, y2)
+
+
     
     if (hex) {
       plot =
@@ -160,5 +167,5 @@ lagged_scatter_plot <-
         )
       )
     
-    plot
+    return(plot)
   }
