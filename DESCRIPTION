@@ -42,13 +42,16 @@ Imports:
     methods,
     stats,
     utils,
-    hms,
-    zoo,
-    pracma,
+    hms
 Suggests: 
     knitr,
     rmarkdown,
-    testthat
+    pracma,
+    testthat,
+    tidymass,
+    htmlwidgets,
+    leaflet,
+    htmltools
 VignetteBuilder: knitr
 biocViews: Technology
 Remotes: 
