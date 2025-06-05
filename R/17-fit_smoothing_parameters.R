@@ -52,8 +52,8 @@ fit_smoothing_parameters <- function(x,
     stop(crayon::red("Not enough valid data points after filtering to fit the model."))
   }
   
-  span_values <- seq(0.1, 0.5, by = 0.01)
-  degree_values <- 1:2
+  # span_values <- seq(0.1, 0.5, by = 0.01)
+  # degree_values <- 1:2
   # Define the parameter combinations
   param_grid <- expand.grid(span = span_values, degree = degree_values)
   
