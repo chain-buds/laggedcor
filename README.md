@@ -22,13 +22,13 @@ The `laggedcor` is an R package used to calculate the lagged correlation for omi
 ---
 
 You can install `laggedcor` from
-[GitHub](https://github.com/jaspershen/laggedcor).
+[GitHub](https://github.com/jaspershen-lab/laggedcor).
 
 ``` r
 if(!require(devtools)){
 install.packages("devtools")
 }
-devtools::install_github("jaspershen/laggedcor")
+devtools::install_github("jaspershen-lab/laggedcor")
 ```
 
 Then you can use `laggedcor_install()` to install all the packages in
