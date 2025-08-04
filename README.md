@@ -6,7 +6,7 @@
 [![](https://img.shields.io/github/languages/code-size/laggedcor/laggedcor.svg)](https://github.com/laggedcor/laggedcor)
 [![Dependencies](https://tinyverse.netlify.com/badge/laggedcor)](https://cran.r-project.org/package=laggedcor)
 [![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/jaspershen-lab/laggedcor)
 ---
 
 `laggedcor` is a part of [tidywearable](https://tidywearable.github.io/).
