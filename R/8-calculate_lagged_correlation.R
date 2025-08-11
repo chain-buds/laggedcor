@@ -61,166 +61,294 @@
 #' object
 #' @importFrom stats approx ccf pnorm
 
+# calculate_lagged_correlation <-
+#   function(x,
+#            y,
+#            time1,
+#            time2,
+#            time_tol = 1,
+#            # lag.max in ccf
+#            step = 1 / 60,
+#            # 1 min
+#            min_matched_sample = 10,
+#            progressbar = TRUE,
+#            all_idx = NULL,
+#            # level = 0.95,
+#            B = 1000,
+#            smooth = FALSE,
+#            threads = 10,
+#            align_method = c("linear", "constant"),
+#            cor_method = c("spearman", "pearson")) {
+#     cor_method <- match.arg(cor_method)
+#     align_method <- match.arg(align_method)
+#     if (length(x) == 0 || length(y) == 0) {
+#       return(NULL)
+#     }
+#     # rescale the input data to the same scale
+#     x <- as.numeric(x) %>%
+#       scale() %>%
+#       as.numeric()
+# 
+#     y <- as.numeric(y) %>%
+#       scale() %>%
+#       as.numeric()
+#     
+# 
+#     # Find common time range
+#     start_time <- max(min(time1), min(time2))
+#     end_time <- min(max(time1), max(time2))
+#     
+#     # align the two time series
+#     time_window1 <-
+#       seq(from = step / 2, to = time_tol, by = step)
+#     
+#     time_window2 <-
+#       -rev(seq(from = step / 2, to = time_tol, by = step))
+#     
+#     time_window <- sort(c(time_window2, time_window1))
+#     
+#     # convert step back to min
+#     target_freq = paste(step * 60, "min")
+#     
+#     # Create regular time sequence at target frequency
+#     regular_times <- seq(from = start_time, to = end_time, by = target_freq)
+#     
+#     x_aligned <- approx(
+#       x = time1,
+#       y = x,
+#       xout = regular_times,
+#       method = align_method
+#     )$y
+#     
+#     y_aligned <- approx(
+#       x = time2,
+#       y = y,
+#       xout = regular_times,
+#       method = align_method
+#     )$y
+#     
+#     # Rank the data to make ccf calculation based on spearman possible
+#     if (cor_method == "spearman") {
+#       x_transformed <- rank(x_aligned)
+#       y_transformed <- rank(y_aligned)
+#       attributes(x_transformed) <- attributes(x_aligned)
+#       attributes(y_transformed) <- attributes(y_aligned)
+#     } else {
+#       x_transformed <- x_aligned
+#       y_transformed <- y_aligned
+#     }
+#     
+#     lag.max = time_tol / step - 1
+#     
+#     ccf_res <- ccf(x_transformed,
+#                    y_transformed,
+#                    lag.max = lag.max,
+#                    plot = FALSE)
+#     
+#     lags <- ccf_res$lag[, 1, 1]
+#     cors <- ccf_res$acf[, 1, 1]
+#     
+#     shift_time <-
+#       paste(
+#         "(", 
+#         paste(
+#           round(time_window[-length(time_window)] * 60, 2), 
+#           round(time_window[-1] * 60, 2), 
+#           sep = ","
+#         ), 
+#         "]", 
+#         sep = ""
+#       )
+#     
+#     shift_time_num =
+#       shift_time %>%
+#       lapply(function(x) {
+#         x %>%
+#           stringr::str_replace("\\(", "") %>%
+#           stringr::str_replace("\\]", "") %>%
+#           stringr::str_split(",") %>%
+#           `[[`(1) %>%
+#           as.numeric() %>%
+#           mean()
+#       }) %>%
+#       unlist()
+#     
+#     # assert len(time_window) - 1 is the same as regular_times
+#     if (length(time_window) - 1 != length(lags)) {
+#       stop(
+#         "Vectors x and y must have the same length: ",
+#         "length(time_window) = ",
+#         length(time_window) - 1,
+#         ", length(lags) = ",
+#         length(lags)
+#       )
+#     }
+#     
+#     
+#     all_idx <- list() # dummy
+#     
+#     all_cor_result <- ccf_res # I really don't know what to give
+#     all_cor_p <- 2 * (1 - pnorm(
+#       abs(cors),
+#       mean = 0,
+#       sd = 1 / sqrt(ccf_res$n.used)
+#     ))
+#     all_cor <- cors
+#     
+#     which_max_idx <-
+#       which.max(abs(all_cor))
+#     
+#     max_idx <- list() # dummy
+#     
+#     # find the idx that cross the 0 lag point
+#     which_global_idx <-
+#       purrr::map(shift_time, function(x) {
+#         x <-
+#           stringr::str_replace(x, "\\(", "") %>%
+#           stringr::str_replace("\\]", "") %>%
+#           stringr::str_split(",") %>%
+#           `[[`(1) %>%
+#           as.numeric()
+#         x[1] < 0 & x[2] > 0
+#       }) %>%
+#       unlist() %>%
+#       which()
+#     
+#     # get the 0 lag index
+#     global_idx <- list() # dummy()
+#     
+#     
+#     global_cor <- all_cor[which_global_idx]
+#     global_cor_p <- all_cor_p[which_global_idx]
+#     
+#     parameter <-
+#       new(
+#         Class = "tidymass_parameter",
+#         pacakge_name = "laggedcor",
+#         function_name = "calculate_lagged_correlation",
+#         parameter = list(
+#           time_tol = time_tol,
+#           step = step,
+#           min_matched_sample = min_matched_sample,
+#           progressbar = progressbar,
+#           threads = threads,
+#           cor_method = cor_method
+#         ),
+#         time = Sys.time()
+#       )
+#     
+#     object <- new(
+#       Class = "lagged_cor_result",
+#       x = x,
+#       time1 = time1,
+#       y = y,
+#       time2 = time2,
+#       idx = all_idx,
+#       all_cor = all_cor,
+#       all_cor_p = all_cor_p,
+#       shift_time = shift_time,
+#       which_max_idx = which_max_idx,
+#       which_global_idx = which_global_idx,
+#       max_idx = max_idx,
+#       max_cor = all_cor[which_max_idx],
+#       global_idx = global_idx,
+#       global_cor = global_cor,
+#       parameter = parameter
+#     )
+#     
+#     return(object)
+#   }
+
+#--- safer version ---
 calculate_lagged_correlation <-
   function(x,
            y,
            time1,
            time2,
            time_tol = 1,
-           # lag.max in ccf
-           step = 1 / 60,
-           # 1 min
+           # lag.max in ccf (derived below)
+           step = 1 / 60,       # 1 min
            min_matched_sample = 10,
            progressbar = TRUE,
-           all_idx = NULL,
-           # level = 0.95,
+           all_idx = NULL,      # kept for API compatibility
            B = 1000,
            smooth = FALSE,
            threads = 10,
            align_method = c("linear", "constant"),
            cor_method = c("spearman", "pearson")) {
-    cor_method <- match.arg(cor_method)
+    
+    cor_method   <- match.arg(cor_method)
     align_method <- match.arg(align_method)
-    if (length(x) == 0 || length(y) == 0) {
-      return(NULL)
-    }
-    # rescale the input data to the same scale
-    x <- as.numeric(x) %>%
-      scale() %>%
-      as.numeric()
-
-    y <- as.numeric(y) %>%
-      scale() %>%
-      as.numeric()
     
-
-    # Find common time range
+    if (length(x) == 0 || length(y) == 0) return(NULL)
+    
+    # --- scale inputs ---
+    x <- as.numeric(x) %>% scale() %>% as.numeric()
+    y <- as.numeric(y) %>% scale() %>% as.numeric()
+    
+    # --- common time range ---
     start_time <- max(min(time1), min(time2))
-    end_time <- min(max(time1), max(time2))
+    end_time   <- min(max(time1), max(time2))
     
-    # align the two time series
-    time_window1 <-
-      seq(from = step / 2, to = time_tol, by = step)
+    # seq.POSIXt by="X min" : avoid float noise in the string
+    by_str <- paste0(format(round(step * 60, 10), trim = TRUE), " min")
+    regular_times <- seq(from = start_time, to = end_time, by = by_str)
     
-    time_window2 <-
-      -rev(seq(from = step / 2, to = time_tol, by = step))
+    # --- align (allow linear extrapolation at edges to avoid NA gaps) ---
+    x_aligned <- approx(x = time1, y = x, xout = regular_times,
+                        method = align_method, rule = 2)$y
+    y_aligned <- approx(x = time2, y = y, xout = regular_times,
+                        method = align_method, rule = 2)$y
     
-    time_window <- sort(c(time_window2, time_window1))
-    
-    # convert step back to min
-    target_freq = paste(step * 60, "min")
-    
-    # Create regular time sequence at target frequency
-    regular_times <- seq(from = start_time, to = end_time, by = target_freq)
-    
-    x_aligned <- approx(
-      x = time1,
-      y = x,
-      xout = regular_times,
-      method = align_method
-    )$y
-    
-    y_aligned <- approx(
-      x = time2,
-      y = y,
-      xout = regular_times,
-      method = align_method
-    )$y
-    
-    # Rank the data to make ccf calculation based on spearman possible
     if (cor_method == "spearman") {
-      x_transformed <- rank(x_aligned)
-      y_transformed <- rank(y_aligned)
-      attributes(x_transformed) <- attributes(x_aligned)
-      attributes(y_transformed) <- attributes(y_aligned)
+      x_transformed <- rank(x_aligned, na.last = "keep")
+      y_transformed <- rank(y_aligned, na.last = "keep")
     } else {
       x_transformed <- x_aligned
       y_transformed <- y_aligned
     }
     
-    lag.max = time_tol / step - 1
+    # --- effective samples (drop NA pairs only here) ---
+    ok    <- !(is.na(x_transformed) | is.na(y_transformed))
+    x_ccf <- x_transformed[ok]
+    y_ccf <- y_transformed[ok]
+    n_eff <- length(x_ccf)
+    if (n_eff < max(2L, min_matched_sample)) return(NULL)
     
-    ccf_res <- ccf(x_transformed,
-                   y_transformed,
-                   lag.max = lag.max,
-                   plot = FALSE)
+    # --- compute integer lag.max safely & cap by n_eff-1 ---
+    n_lag  <- as.integer(round(time_tol / step))
+    lag.max <- max(0L, n_lag - 1L)
+    lag.max <- min(lag.max, n_eff - 1L)
     
-    lags <- ccf_res$lag[, 1, 1]
+    # --- ccf on complete cases only ---
+    ccf_res <- ccf(x_ccf, y_ccf, lag.max = lag.max, plot = FALSE)
+    lags <- as.integer(ccf_res$lag[, 1, 1])  # -L ... 0 ... +L
     cors <- ccf_res$acf[, 1, 1]
+    n_used <- ccf_res$n.used
     
-    shift_time <-
-      paste(
-        "(", 
-        paste(
-          round(time_window[-length(time_window)] * 60, 2), 
-          round(time_window[-1] * 60, 2), 
-          sep = ","
-        ), 
-        "]", 
-        sep = ""
-      )
+    # --- p-values (normal approx around 0) ---
+    all_cor   <- cors
+    all_cor_p <- 2 * (1 - pnorm(abs(all_cor), mean = 0, sd = 1 / sqrt(n_used)))
     
-    shift_time_num =
-      shift_time %>%
-      lapply(function(x) {
-        x %>%
-          stringr::str_replace("\\(", "") %>%
-          stringr::str_replace("\\]", "") %>%
-          stringr::str_split(",") %>%
-          `[[`(1) %>%
-          as.numeric() %>%
-          mean()
-      }) %>%
-      unlist()
+    # --- build shift_time from lags (so it ALWAYS matches) ---
+    # edges at (lag - 0.5, lag + 0.5] * step (hours); display in minutes
+    edges_hours <- (min(lags) - 0.5):(max(lags) + 0.5) * step
+    shift_time <- paste0("(", round(head(edges_hours, -1) * 60, 2), ",",
+                         round(tail(edges_hours, -1) * 60, 2), "]")
     
-    # assert len(time_window) - 1 is the same as regular_times
-    if (length(time_window) - 1 != length(lags)) {
-      stop(
-        "Vectors x and y must have the same length: ",
-        "length(time_window) = ",
-        length(time_window) - 1,
-        ", length(lags) = ",
-        length(lags)
-      )
-    }
+
+    which_max_idx   <- which.max(abs(all_cor))
+    which_global_idx <- which(lags == 0L)  # index of 0-lag (length 1 if present)
     
+
+    all_idx  <- list() #dummy
+    max_idx  <- list() #dummy
+    global_idx <- list() #dummy
     
-    all_idx <- list() # dummy
+    global_cor   <- if (length(which_global_idx)) all_cor[which_global_idx] else NA_real_
+    global_cor_p <- if (length(which_global_idx)) all_cor_p[which_global_idx] else NA_real_
     
-    all_cor_result <- ccf_res # I really don't know what to give
-    all_cor_p <- 2 * (1 - pnorm(
-      abs(cors),
-      mean = 0,
-      sd = 1 / sqrt(ccf_res$n.used)
-    ))
-    all_cor <- cors
-    
-    which_max_idx <-
-      which.max(abs(all_cor))
-    
-    max_idx <- list() # dummy
-    
-    # find the idx that cross the 0 lag point
-    which_global_idx <-
-      purrr::map(shift_time, function(x) {
-        x <-
-          stringr::str_replace(x, "\\(", "") %>%
-          stringr::str_replace("\\]", "") %>%
-          stringr::str_split(",") %>%
-          `[[`(1) %>%
-          as.numeric()
-        x[1] < 0 & x[2] > 0
-      }) %>%
-      unlist() %>%
-      which()
-    
-    # get the 0 lag index
-    global_idx <- list() # dummy()
-    
-    
-    global_cor <- all_cor[which_global_idx]
-    global_cor_p <- all_cor_p[which_global_idx]
-    
+
     parameter <-
       new(
         Class = "tidymass_parameter",
@@ -237,6 +365,7 @@ calculate_lagged_correlation <-
         time = Sys.time()
       )
     
+
     object <- new(
       Class = "lagged_cor_result",
       x = x,
